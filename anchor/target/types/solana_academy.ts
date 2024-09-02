@@ -44,8 +44,37 @@ export type SolanaAcademy = {
           ]
         },
         {
+          "name": "mint",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "academy"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
         }
       ],
       "args": [
@@ -280,6 +309,10 @@ export type SolanaAcademy = {
           {
             "name": "enrollmentCount",
             "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
           }
         ]
       }

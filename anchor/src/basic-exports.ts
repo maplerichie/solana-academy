@@ -5,7 +5,7 @@ import type { SolanaAcademy } from '../target/types/solana_academy';
 import { IDL as SolanaAcademyIDL } from '../target/types/solana_academy';
 
 // Re-export the generated IDL and type
-export { SolanaAcademy, SolanaAcademyIDLIDL };
+export { SolanaAcademy, SolanaAcademyIDL };
 
 // The programId is imported from the program IDL.
 export const BASIC_PROGRAM_ID = new PublicKey(SolanaAcademyIDL.address);
