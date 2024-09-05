@@ -117,6 +117,10 @@ export type SolanaAcademy = {
           "signer": true
         },
         {
+          "name": "admin",
+          "writable": true
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
