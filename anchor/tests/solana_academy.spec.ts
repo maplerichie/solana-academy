@@ -1,7 +1,12 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program } from '@coral-xyz/anchor';
 import { SolanaAcademy } from '../target/types/solana_academy';
-import { LAMPORTS_PER_SOL, SystemProgram, Keypair, PublicKey } from '@solana/web3.js';
+import {
+  LAMPORTS_PER_SOL,
+  SystemProgram,
+  Keypair,
+  PublicKey,
+} from '@solana/web3.js';
 
 const COURSE_DURATION_IN_SECONDS = 42 * 24 * 60 * 60;
 
@@ -14,12 +19,11 @@ interface CourseData {
 }
 
 describe('Solana Academy', () => {
-
   const provider = anchor.AnchorProvider.local();
   anchor.setProvider(provider);
 
-  const academyName: string = "My test academy";
-  const courseName: string = "My academy course";
+  const academyName: string = 'My test academy';
+  const courseName: string = 'My academy course';
   const courseFee: number = 1 * LAMPORTS_PER_SOL;
   const program = anchor.workspace.SolanaAcademy as Program<SolanaAcademy>;
 
@@ -46,9 +50,8 @@ describe('Solana Academy', () => {
   });
 
   it('Initializes the Academy', async () => {
-
     const tx = await program.methods
-      .initializeAcademy(academyName)
+      .initializeAcademy(academyName, new anchor.BN(courseFee))
       .accounts({
         academy: academy.publicKey,
         admin: admin.publicKey,
@@ -57,10 +60,10 @@ describe('Solana Academy', () => {
       .signers([admin, academy])
       .rpc();
 
-    console.log("Init Academy Tx signature:", tx);
+    console.log('Init Academy Tx signature:', tx);
 
     const academyState = await program.account.academy.fetch(academy.publicKey);
-    console.log("academy data structure", academyState);
+    console.log('academy data structure', academyState);
 
     expect(academyState.name).toBe(academyName);
     expect(academyState.admin.toString()).toBe(admin.publicKey.toString());
@@ -72,7 +75,7 @@ describe('Solana Academy', () => {
 
     const courseData: CourseData = {
       name: courseName,
-      description: "Sol dev course",
+      description: 'Sol dev course',
       startDate: new anchor.BN(currentTime),
       endDate: new anchor.BN(currentTime + COURSE_DURATION_IN_SECONDS),
       tuitionFee: new anchor.BN(courseFee),
@@ -89,27 +92,41 @@ describe('Solana Academy', () => {
       .signers([admin, course])
       .rpc();
 
-    console.log("Create course Tx signature:", tx);
+    console.log('Create course Tx signature:', tx);
 
     const courseState = await program.account.course.fetch(course.publicKey);
-    console.log("Course onchain representation:", courseState);
-
+    console.log('Course onchain representation:', courseState);
     const academyState = await program.account.academy.fetch(academy.publicKey);
 
-    expect(courseState.id.toNumber()).toBe(academyState.courseCount.toNumber() - 1);
+    expect(courseState.id.toNumber()).toBe(
+      academyState.courseCount.toNumber() - 1
+    );
     expect(courseState.name).toBe(courseName);
     expect(courseState.description).toBe(courseData.description);
     expect(courseState.startDate.toNumber()).toBe(currentTime);
-    expect(courseState.endDate.toNumber()).toBe(currentTime + COURSE_DURATION_IN_SECONDS);
+    expect(courseState.endDate.toNumber()).toBe(
+      currentTime + COURSE_DURATION_IN_SECONDS
+    );
     expect(courseState.tuitionFee.toNumber()).toBe(courseFee);
     expect(academyState.courseCount.toNumber()).toBe(1);
   });
 
   it('Enrolls a Student in the Course', async () => {
-
     const courseId = new anchor.BN(0);
 
-    const [enrollmentPDA, bump] = await PublicKey.findProgramAddressSync(
+    // Fetch academy state to get course count
+    const academyState = await program.account.academy.fetch(academy.publicKey);
+    let courseId: anchor.BN;
+
+    if (academyState.courseCount.toNumber() > 0) {
+      // Get the most recent course ID by subtracting 1 from the total count
+      courseId = new anchor.BN(academyState.courseCount.toNumber() - 1);
+      console.log(`Enrolling in course ID: ${courseId.toString()}`);
+    } else {
+      throw new Error("No courses available for enrollment.");
+    }
+
+    const [enrollmentPDA] = await PublicKey.findProgramAddressSync(
       [
         Buffer.from('enrollment'),
         course.publicKey.toBuffer(),
@@ -118,7 +135,7 @@ describe('Solana Academy', () => {
       program.programId
     );
 
-    console.log('Enrollment PDA:', enrollmentPDA.toBase58())
+    console.log('Enrollment PDA:', enrollmentPDA.toBase58());
 
     const tx = await program.methods
       .enrollInCourse(courseId)
@@ -132,19 +149,16 @@ describe('Solana Academy', () => {
       .signers([student])
       .rpc();
 
-    console.log("Enroll in Course Tx signature:", tx);
+    console.log('Enroll in Course Tx signature:', tx);
 
-    /* const courseState = await program.account.course.fetch(course.publicKey);
-    console.log("Course onchain representation:", courseState);
+    const enrollmentState = await program.account.enrollment.fetch(enrollmentPDA);
+    console.log("Enrollment onchain representation:", enrollmentState);
 
-    const academyState = await program.account.academy.fetch(academy.publicKey);
- */
-    /* expect(courseState.id.toNumber()).toBe(academyState.courseCount.toNumber() - 1);
-    expect(courseState.name).toBe(courseName);
-    expect(courseState.description).toBe(courseData.description);
-    expect(courseState.startDate.toNumber()).toBe(currentTime);
-    expect(courseState.endDate.toNumber()).toBe(currentTime + COURSE_DURATION_IN_SECONDS);
-    expect(courseState.tuitionFee.toNumber()).toBe(courseFee);
-    expect(academyState.courseCount.toNumber()).toBe(1); */
+    expect(enrollmentState.student.toString()).toBe(student.publicKey.toString());
+    expect(enrollmentState.course.toString()).toBe(course.publicKey.toString());
+    expect(enrollmentState.completed.toString()).toBe("false");
+
+    const courseState = await program.account.course.fetch(course.publicKey);
+    expect(courseState.enrollmentCount.toNumber()).toBe(1);
   });
 });

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solana_academy.json`.
  */
 export type SolanaAcademy = {
-  "address": "2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv",
+  "address": "79zUy3DKMd4xfFpjnzBVyxaaEzD6vV6aAVzHS8U7JS1Y",
   "metadata": {
     "name": "solanaAcademy",
     "version": "0.1.0",

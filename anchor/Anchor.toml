@@ -1,11 +1,12 @@
 [toolchain]
 
 [features]
+seeds = false
 resolution = true
 skip-lint = false
 
 [programs.localnet]
-basic = "2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv"
+basic = "79zUy3DKMd4xfFpjnzBVyxaaEzD6vV6aAVzHS8U7JS1Y"
 
 [registry]
 url = "https://api.apr.dev"

@@ -1,24 +1,24 @@
 'use client';
 
 import { Keypair } from '@solana/web3.js';
-import { useBasicProgram } from './basic-data-access';
+import { useAcademyProgram } from './basic-data-access';
 
 export function BasicCreate() {
-  const { greet } = useBasicProgram();
+  const { initialize } = useAcademyProgram();
 
   return (
     <button
       className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => greet.mutateAsync(Keypair.generate())}
-      disabled={greet.isPending}
+      onClick={() => initialize.mutateAsync(Keypair.generate())}
+      disabled={initialize.isPending}
     >
-      Run program{greet.isPending && '...'}
+      Run program{initialize.isPending && '...'}
     </button>
   );
 }
 
 export function BasicProgram() {
-  const { getProgramAccount } = useBasicProgram();
+  const { getProgramAccount } = useAcademyProgram();
 
   if (getProgramAccount.isLoading) {
     return <span className="loading loading-spinner loading-lg"></span>;

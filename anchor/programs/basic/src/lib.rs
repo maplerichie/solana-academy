@@ -8,7 +8,7 @@ pub mod state;
 use instructions::*;
 use state::*;
 
-declare_id!("2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv");
+declare_id!("79zUy3DKMd4xfFpjnzBVyxaaEzD6vV6aAVzHS8U7JS1Y");
 
 #[program]
 pub mod solana_academy {
