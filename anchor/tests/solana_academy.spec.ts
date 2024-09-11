@@ -7,6 +7,12 @@ import {
   Keypair,
   PublicKey,
 } from '@solana/web3.js';
+import { 
+  TOKEN_PROGRAM_ID,
+  createMint,
+  createAccount,
+  mintTo
+} from '@solana/spl-token';
 
 const COURSE_DURATION_IN_SECONDS = 42 * 24 * 60 * 60;
 
@@ -32,6 +38,9 @@ describe('Solana Academy', () => {
   const course = Keypair.generate();
   const student = Keypair.generate();
 
+  let studentNftMint: PublicKey;
+  let studentTokenAccount: PublicKey;
+
   // Initialize test environment with admin airdrop
   beforeAll(async () => {
     await provider.connection.confirmTransaction(
@@ -47,6 +56,22 @@ describe('Solana Academy', () => {
         10 * LAMPORTS_PER_SOL
       )
     );
+
+    studentNftMint = await createMint(
+      provider.connection,
+      admin,
+      admin.publicKey,
+      null,
+      0
+    )
+
+    studentTokenAccount = await createAccount(
+      provider.connection,
+      admin,
+      studentNftMint,
+      student.publicKey,
+    )
+
   });
 
   it('Initializes the Academy', async () => {
@@ -68,6 +93,7 @@ describe('Solana Academy', () => {
     expect(academyState.name).toBe(academyName);
     expect(academyState.admin.toString()).toBe(admin.publicKey.toString());
     expect(academyState.courseCount.toNumber()).toBe(0);
+    expect(academyState.studentCounter.toNumber()).toBe(0);
   });
 
   it('Creates a course', async () => {
@@ -111,54 +137,35 @@ describe('Solana Academy', () => {
     expect(academyState.courseCount.toNumber()).toBe(1);
   });
 
-  it('Enrolls a Student in the Course', async () => {
-    const courseId = new anchor.BN(0);
+  it('Enrolls a Student in the Academy', async () => {
 
     // Fetch academy state to get course count
     const academyState = await program.account.academy.fetch(academy.publicKey);
-    let courseId: anchor.BN;
+    const payment = academyState.enrollmentFee.toNumber();
 
-    if (academyState.courseCount.toNumber() > 0) {
-      // Get the most recent course ID by subtracting 1 from the total count
-      courseId = new anchor.BN(academyState.courseCount.toNumber() - 1);
-      console.log(`Enrolling in course ID: ${courseId.toString()}`);
-    } else {
-      throw new Error("No courses available for enrollment.");
-    }
-
-    const [enrollmentPDA] = await PublicKey.findProgramAddressSync(
-      [
-        Buffer.from('enrollment'),
-        course.publicKey.toBuffer(),
-        student.publicKey.toBuffer(),
-      ],
-      program.programId
-    );
-
-    console.log('Enrollment PDA:', enrollmentPDA.toBase58());
+    console.log(`The enrollment fee is `, payment);
 
     const tx = await program.methods
-      .enrollInCourse(courseId)
+      .enrollStudentInAcademy(new anchor.BN(payment))
       .accounts({
         academy: academy.publicKey,
-        course: course.publicKey,
-        enrollment: enrollmentPDA,
         student: student.publicKey,
+        studentNftMint: studentNftMint,
+        studentTokenAccount: studentTokenAccount,
+        admin: admin.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .signers([student])
+      .signers([student, admin])
       .rpc();
 
     console.log('Enroll in Course Tx signature:', tx);
 
-    const enrollmentState = await program.account.enrollment.fetch(enrollmentPDA);
-    console.log("Enrollment onchain representation:", enrollmentState);
+    const academyStateUpdated = await program.account.academy.fetch(academy.publicKey);
 
-    expect(enrollmentState.student.toString()).toBe(student.publicKey.toString());
-    expect(enrollmentState.course.toString()).toBe(course.publicKey.toString());
-    expect(enrollmentState.completed.toString()).toBe("false");
-
-    const courseState = await program.account.course.fetch(course.publicKey);
-    expect(courseState.enrollmentCount.toNumber()).toBe(1);
+    expect(academyStateUpdated.name).toBe(academyName);
+    expect(academyStateUpdated.admin.toString()).toBe(admin.publicKey.toString());
+    expect(academyStateUpdated.courseCount.toNumber()).toBe(1);
+    expect(academyStateUpdated.studentCounter.toNumber()).toBe(1);
   });
 });
