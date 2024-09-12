@@ -1,6 +1,7 @@
 use crate::error::*;
 use crate::state::*;
 use anchor_lang::prelude::*;
+use anchor_spl::token::{self, Mint, Token, TokenAccount};
 
 #[derive(Accounts)]
 pub struct EnrollInCourse<'info> {
@@ -19,7 +20,9 @@ pub struct EnrollInCourse<'info> {
     #[account(mut)]
     pub student: Signer<'info>,
     #[account(mut)]
-    pub admin: AccountInfo<'info>,
+    pub admin: Signer<'info>,
+    #[account(mut)]
+    pub student_token_account: Account<'info, TokenAccount>,
     pub system_program: Program<'info, System>,
 }
 
@@ -31,6 +34,10 @@ pub fn enroll_in_course(ctx: Context<EnrollInCourse>, course_id: u64) -> Result<
 
     if course.id != course_id {
         return Err(AcademyError::InvalidCourseId.into());
+    }
+
+    if ctx.accounts.student_token_account.amount != 1 {
+        return Err(AcademyError::InvalidStudentNFT.into());
     }
 
     //TODO: probably need a check that the course owner is the admin

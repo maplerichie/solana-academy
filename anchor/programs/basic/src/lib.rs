@@ -8,7 +8,7 @@ pub mod state;
 use instructions::*;
 use state::*;
 
-declare_id!("2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv");
+declare_id!("6YHkJkEAdhKercoULeR4tShiJzSWCNFMEG7QhMNX4CsD");
 
 #[program]
 pub mod solana_academy {
@@ -16,6 +16,10 @@ pub mod solana_academy {
 
     pub fn initialize_academy(ctx: Context<InitializeAcademy>, name: String) -> Result<()> {
         instructions::admin::initialize_academy(ctx, name)
+    }
+
+    pub fn enroll_student_in_academy(ctx: Context<EnrollInAcademy>, payment: u64) -> Result<()> {
+        instructions::admin::enroll_student_in_academy(ctx, payment)
     }
 
     pub fn create_course(ctx: Context<CreateCourse>, course_data: CourseData) -> Result<()> {
@@ -26,5 +30,4 @@ pub mod solana_academy {
         instructions::student::enroll_in_course(ctx, course_id)
     }
 
-    // Add other instruction handlers here
 }

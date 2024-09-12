@@ -1,5 +1,5 @@
 {
-  "address": "2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv",
+  "address": "6YHkJkEAdhKercoULeR4tShiJzSWCNFMEG7QhMNX4CsD",
   "metadata": {
     "name": "solana_academy",
     "version": "0.1.0",
@@ -112,6 +112,11 @@
         },
         {
           "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "student_token_account",
           "writable": true
         },
         {
@@ -122,6 +127,57 @@
       "args": [
         {
           "name": "course_id",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enroll_student_in_academy",
+      "discriminator": [
+        255,
+        180,
+        113,
+        188,
+        101,
+        15,
+        188,
+        87
+      ],
+      "accounts": [
+        {
+          "name": "academy",
+          "writable": true
+        },
+        {
+          "name": "student_nft_mint",
+          "writable": true
+        },
+        {
+          "name": "student_token_account",
+          "writable": true
+        },
+        {
+          "name": "student",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "payment",
           "type": "u64"
         }
       ]
@@ -221,8 +277,28 @@
     },
     {
       "code": 6003,
+      "name": "InsufficientSchoolFee",
+      "msg": "Insufficient balance to pay school fees"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientCourseFee",
+      "msg": "Insufficient balance to pay school fees"
+    },
+    {
+      "code": 6005,
       "name": "InsufficientBalance",
       "msg": "Insufficient balance to pay tuition fee"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidNFTAuthority",
+      "msg": "Invalid mint NFT mint authority"
+    },
+    {
+      "code": 6007,
+      "name": "InvalidStudentNFT",
+      "msg": "Invalid student NFT"
     }
   ],
   "types": [
@@ -241,6 +317,14 @@
           },
           {
             "name": "course_count",
+            "type": "u64"
+          },
+          {
+            "name": "enrollment_fee",
+            "type": "u64"
+          },
+          {
+            "name": "student_counter",
             "type": "u64"
           }
         ]

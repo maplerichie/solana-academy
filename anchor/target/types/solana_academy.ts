@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solana_academy.json`.
  */
 export type SolanaAcademy = {
-  "address": "2YiEtpUg9CWjHS4Ko6LvezzP9wBuyAuEzpv26AERFDSv",
+  "address": "6YHkJkEAdhKercoULeR4tShiJzSWCNFMEG7QhMNX4CsD",
   "metadata": {
     "name": "solanaAcademy",
     "version": "0.1.0",
@@ -118,6 +118,11 @@ export type SolanaAcademy = {
         },
         {
           "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "studentTokenAccount",
           "writable": true
         },
         {
@@ -128,6 +133,57 @@ export type SolanaAcademy = {
       "args": [
         {
           "name": "courseId",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "enrollStudentInAcademy",
+      "discriminator": [
+        255,
+        180,
+        113,
+        188,
+        101,
+        15,
+        188,
+        87
+      ],
+      "accounts": [
+        {
+          "name": "academy",
+          "writable": true
+        },
+        {
+          "name": "studentNftMint",
+          "writable": true
+        },
+        {
+          "name": "studentTokenAccount",
+          "writable": true
+        },
+        {
+          "name": "student",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "payment",
           "type": "u64"
         }
       ]
@@ -227,8 +283,28 @@ export type SolanaAcademy = {
     },
     {
       "code": 6003,
+      "name": "insufficientSchoolFee",
+      "msg": "Insufficient balance to pay school fees"
+    },
+    {
+      "code": 6004,
+      "name": "insufficientCourseFee",
+      "msg": "Insufficient balance to pay school fees"
+    },
+    {
+      "code": 6005,
       "name": "insufficientBalance",
       "msg": "Insufficient balance to pay tuition fee"
+    },
+    {
+      "code": 6006,
+      "name": "invalidNftAuthority",
+      "msg": "Invalid mint NFT mint authority"
+    },
+    {
+      "code": 6007,
+      "name": "invalidStudentNft",
+      "msg": "Invalid student NFT"
     }
   ],
   "types": [
@@ -247,6 +323,14 @@ export type SolanaAcademy = {
           },
           {
             "name": "courseCount",
+            "type": "u64"
+          },
+          {
+            "name": "enrollmentFee",
+            "type": "u64"
+          },
+          {
+            "name": "studentCounter",
             "type": "u64"
           }
         ]
