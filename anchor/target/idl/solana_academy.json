@@ -116,8 +116,10 @@
           "signer": true
         },
         {
-          "name": "student_token_account",
-          "writable": true
+          "name": "student_nft_mint"
+        },
+        {
+          "name": "student_token_account"
         },
         {
           "name": "system_program",

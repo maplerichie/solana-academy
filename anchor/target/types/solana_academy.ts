@@ -122,8 +122,10 @@ export type SolanaAcademy = {
           "signer": true
         },
         {
-          "name": "studentTokenAccount",
-          "writable": true
+          "name": "studentNftMint"
+        },
+        {
+          "name": "studentTokenAccount"
         },
         {
           "name": "systemProgram",

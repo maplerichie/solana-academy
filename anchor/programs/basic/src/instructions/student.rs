@@ -21,7 +21,9 @@ pub struct EnrollInCourse<'info> {
     pub student: Signer<'info>,
     #[account(mut)]
     pub admin: Signer<'info>,
-    #[account(mut)]
+    #[account(constraint = student_nft_mint.mint_authority.unwrap() == admin.key())]
+    pub student_nft_mint: Account<'info, Mint>,
+    #[account(constraint = student_token_account.mint == student_nft_mint.key())]
     pub student_token_account: Account<'info, TokenAccount>,
     pub system_program: Program<'info, System>,
 }
@@ -39,8 +41,6 @@ pub fn enroll_in_course(ctx: Context<EnrollInCourse>, course_id: u64) -> Result<
     if ctx.accounts.student_token_account.amount != 1 {
         return Err(AcademyError::InvalidStudentNFT.into());
     }
-
-    //TODO: probably need a check that the course owner is the admin
 
     let ix = anchor_lang::solana_program::system_instruction::transfer(
         &student.key(),

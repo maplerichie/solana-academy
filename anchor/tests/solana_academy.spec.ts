@@ -200,6 +200,7 @@ describe('Solana Academy', () => {
         enrollment: enrollmentPDA,
         student: student.publicKey,
         admin: admin.publicKey,
+        studentNftMint: studentNftMint,
         studentTokenAccount: studentTokenAccount,
         systemProgram: SystemProgram.programId,
       })
